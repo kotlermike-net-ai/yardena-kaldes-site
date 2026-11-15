@@ -29,7 +29,9 @@ ${noindex ? ROBOTS : ''}<link rel="canonical" href="${url}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="${c.meta.ogLocale}">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="${prefix}assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${prefix}favicon.ico" sizes="32x32 48x48">
+<link rel="icon" href="${prefix}assets/favicon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="${prefix}assets/apple-touch-icon.png">
 <link rel="preload" href="${prefix}fonts/heebo-hebrew-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${prefix}css/fonts.css">
 <link rel="stylesheet" href="${prefix}css/style.css">
