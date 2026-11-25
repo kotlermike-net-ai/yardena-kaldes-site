@@ -3,3 +3,7 @@ node_modules/
 PRIVATE-NOTES.md
 CLAUDE.md
 PROGRESS.md
+
+# client voice recordings (private)
+*.mp4
+*.m4a
