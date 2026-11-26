@@ -76,7 +76,7 @@ function homePage(c) {
   const eduSections = e.sections.map((sec) => {
     const body = sec.paragraphs ? sec.paragraphs.map((x) => `<p>${txt(x)}</p>`).join('') : '';
     const list = sec.items ? `<ol class="timeline">${sec.items.map((i) => `<li><span class="when">${i.ltr ? `<bdi dir="ltr">${esc(i.when)}</bdi>` : esc(i.when)}</span><span class="what">${txt(i.text)}</span></li>`).join('')}</ol>` : '';
-    return `<div class="edu-block reveal"><h3>${txt(sec.heading)}</h3>${body}${list}</div>`;
+    return `<div class="edu-block reveal"><h3><span>${txt(sec.heading)}</span></h3>${body}${list}</div>`;
   }).join('\n      ');
   const headHtml = head(c, { title: c.meta.title, desc: c.meta.description, canonicalPath: '/', prefix: p })
     .replace('</head>', `<script type="application/ld+json">${JSON.stringify(ld)}</script>\n</head>`);
