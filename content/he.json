@@ -39,6 +39,8 @@
   "hero": {
     "name": "ירדנה קלדס, M.A",
     "title": "מטפלת זוגית ומשפחתית",
+    "photo": "/assets/profile.webp",
+    "logo": "/assets/logo.webp",
     "contact": [
       {
         "label": "טלפון:",

@@ -9,6 +9,10 @@ const site = read('content/site.json');
 const LATIN = /([A-Za-z][A-Za-z0-9.&'’-]*(?: [A-Za-z0-9.&'’-]+)*)/;
 const txt = (s) => String(s).split(LATIN).map((part, i) => (i % 2 ? '<bdi dir="ltr">' + esc(part) + '</bdi>' : esc(part))).join('');
 const ROBOTS = '<meta name="robots" content="noindex, nofollow">\n';
+// CMS image fields are stored root-relative (/assets/...). Strip the slash so paths stay relative (GitHub Pages subfolder).
+const rel = (p) => String(p).replace(/^\/+/, '');
+// Netlify Identity invite / password-reset links land on the home page. Send them to the CMS, which handles the token.
+const CMS_TOKEN_REDIRECT = '<script>if(/(invite|recovery|confirmation|email_change)_token=/.test(location.hash))location.replace("admin/"+location.hash);</script>\n';
 
 function head(c, { title, desc, canonicalPath, prefix, draft, forceNoindex }) {
   const url = site.siteUrl + canonicalPath;
@@ -74,12 +78,12 @@ function homePage(c) {
   const contactDl = hero.contact.map((x) => `<div><dt>${esc(x.label)}</dt><dd>${x.href ? `<a href="${x.href}">${esc(x.value)}</a>` : esc(x.value)}</dd></div>`).join('');
   const t = c.intro, s = c.specialties, e = c.education, k = c.contact, f = k.form;
   const eduSections = e.sections.map((sec) => {
-    const body = sec.paragraphs ? sec.paragraphs.map((x) => `<p>${txt(x)}</p>`).join('') : '';
-    const list = sec.items ? `<ol class="timeline">${sec.items.map((i) => `<li><span class="when">${i.ltr ? `<bdi dir="ltr">${esc(i.when)}</bdi>` : esc(i.when)}</span><span class="what">${txt(i.text)}</span></li>`).join('')}</ol>` : '';
+    const body = sec.paragraphs && sec.paragraphs.length ? sec.paragraphs.map((x) => `<p>${txt(x)}</p>`).join('') : '';
+    const list = sec.items && sec.items.length ? `<ol class="timeline">${sec.items.map((i) => `<li><span class="when">${i.ltr ? `<bdi dir="ltr">${esc(i.when)}</bdi>` : esc(i.when)}</span><span class="what">${txt(i.text)}</span></li>`).join('')}</ol>` : '';
     return `<div class="edu-block reveal"><h3><span>${txt(sec.heading)}</span></h3>${body}${list}</div>`;
   }).join('\n      ');
   const headHtml = head(c, { title: c.meta.title, desc: c.meta.description, canonicalPath: '/', prefix: p })
-    .replace('</head>', `<script type="application/ld+json">${JSON.stringify(ld)}</script>\n</head>`);
+    .replace('</head>', CMS_TOKEN_REDIRECT + `<script type="application/ld+json">${JSON.stringify(ld)}</script>\n</head>`);
   return headHtml + `
 <body>
 ${header(c, p, true)}
@@ -88,7 +92,7 @@ ${header(c, p, true)}
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="wrap hero-inner">
       <div class="hero-card">
-        <img class="hero-logo" src="assets/logo.webp" alt="${esc(c.ui.logoAlt)}" width="360" height="287">
+        <img class="hero-logo" src="${esc(rel(hero.logo))}" alt="${esc(c.ui.logoAlt)}" width="360" height="287">
         <h1 id="hero-title">${esc(hero.name)}</h1>
         <p class="hero-sub">${esc(hero.title)}</p>
         <dl class="contact-list">${contactDl}</dl>
@@ -96,7 +100,7 @@ ${header(c, p, true)}
       <figure class="hero-portrait">
         <span class="portrait-disc" aria-hidden="true"></span>
         <span class="portrait-ring" aria-hidden="true"></span>
-        <img class="hero-photo" src="assets/profile.webp" alt="${esc(c.ui.photoAlt)}" width="720" height="970" fetchpriority="high">
+        <img class="hero-photo" src="${esc(rel(hero.photo))}" alt="${esc(c.ui.photoAlt)}" width="720" height="970" fetchpriority="high">
       </figure>
     </div>
   </section>

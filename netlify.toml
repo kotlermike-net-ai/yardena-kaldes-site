@@ -1,0 +1,13 @@
+# Netlify settings. Works the same on any Netlify account (nothing account-specific here).
+[build]
+  command = "node build.mjs"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# The CMS editor must never appear in search results.
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

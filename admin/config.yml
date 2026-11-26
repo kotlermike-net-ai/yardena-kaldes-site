@@ -1,0 +1,219 @@
+# Decap CMS settings for the site editor at /admin.
+# Login: Netlify Identity (email + password) with Git Gateway. Works only on Netlify (not GitHub Pages).
+# Nothing here is tied to a specific GitHub or Netlify account: git-gateway uses whichever repo the Netlify site is connected to.
+# NOT TESTED until the site runs on Netlify with Identity + Git Gateway enabled.
+#
+# Switching to Decap Turbo later (if Git Gateway stops working): replace the backend block with
+#   backend:
+#     name: turbo-github
+#     turbo_site_id: <site id from the Turbo dashboard>
+#     branch: main
+# The repo is then set in the Turbo dashboard. This file is the only place to change.
+backend:
+  name: git-gateway
+  branch: main
+  commit_messages:
+    update: "עדכון תוכן: {{slug}}"
+    uploadMedia: "העלאת תמונה: {{path}}"
+    deleteMedia: "מחיקת תמונה: {{path}}"
+
+# Local testing only (runs on localhost with `npx decap-server`). Ignored on the live site.
+local_backend: true
+
+locale: he
+publish_mode: simple
+
+# Uploaded images go here. Stored as /assets/uploads/... and made relative by build.mjs.
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+collections:
+  - name: pages
+    label: תוכן האתר
+    editor:
+      preview: false
+    files:
+      - name: home
+        label: העמוד הראשי
+        file: content/he.json
+        format: json
+        fields:
+          - { name: lang, widget: hidden, default: he }
+          - { name: dir, widget: hidden, default: rtl }
+
+          - name: hero
+            label: "ראש העמוד (שם, תמונה ופרטי קשר)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: name, label: "שם ותואר", widget: string }
+              - { name: title, label: "תיאור מקצוע", widget: string }
+              - { name: photo, label: "תמונת פרופיל", widget: image, hint: "מומלץ תמונה לאורך (גובה גדול מרוחב). התמונה נחתכת בעיגול בחלק העליון." }
+              - { name: logo, label: "לוגו קטן", widget: image }
+              - name: contact
+                label: "פרטי קשר בראש העמוד"
+                widget: list
+                allow_add: false
+                allow_remove: false
+                allow_reorder: false
+                summary: "{{fields.label}} {{fields.value}}"
+                hint: "הסדר קבוע: טלפון, דואר, כתובת. אם משנים טלפון או מייל, לשנות גם את שדה הקישור."
+                fields:
+                  - { name: label, label: "כותרת", widget: string }
+                  - { name: value, label: "ערך", widget: string }
+                  - { name: href, label: "קישור (למשל tel:+972546374354 או mailto:...)", widget: string, required: false }
+
+          - name: intro
+            label: "היכרות"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "כותרת", widget: string }
+              - name: paragraphs
+                label: "פסקאות"
+                label_singular: "פסקה"
+                widget: list
+                field: { name: paragraph, label: "פסקה", widget: text }
+              - { name: quote, label: "ציטוט", widget: text }
+              - { name: approachHeading, label: "כותרת הגישה הטיפולית", widget: string }
+              - name: approach
+                label: "גישה טיפולית (רשימה)"
+                label_singular: "שורה"
+                widget: list
+                field: { name: item, label: "שורה", widget: text }
+
+          - name: specialties
+            label: "תחומי התמחות"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "כותרת", widget: string }
+              - name: items
+                label: "כרטיסים"
+                label_singular: "כרטיס"
+                widget: list
+                summary: "{{fields.html}}"
+                fields:
+                  - { name: html, label: "טקסט הכרטיס", widget: text, hint: "אם יש קישור, הוא כתוב כך: <a href=\"כתובת\" ...>מילה</a>. לשנות רק את הטקסט ולא את הסימנים." }
+
+          - name: education
+            label: "השכלה"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "כותרת הסקשן", widget: string }
+              - name: sections
+                label: "חלקים"
+                label_singular: "חלק"
+                widget: list
+                summary: "{{fields.heading}}"
+                fields:
+                  - { name: heading, label: "כותרת החלק", widget: string }
+                  - name: paragraphs
+                    label: "פסקאות (לא חובה)"
+                    label_singular: "פסקה"
+                    widget: list
+                    required: false
+                    field: { name: paragraph, label: "פסקה", widget: text }
+                  - name: items
+                    label: "שורות בציר הזמן (לא חובה)"
+                    label_singular: "שורה"
+                    widget: list
+                    required: false
+                    summary: "{{fields.when}}: {{fields.text}}"
+                    fields:
+                      - { name: when, label: "שנים", widget: string, hint: "למשל: 2017 - הווה" }
+                      - { name: ltr, label: "שנים מספריות בלבד, להציג משמאל לימין", widget: boolean, default: false, required: false, hint: "לסמן רק לטווח כמו 1986-1982" }
+                      - { name: text, label: "תיאור", widget: text }
+
+          - name: contact
+            label: "צור קשר"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: heading, label: "כותרת", widget: string }
+              - { name: lead, label: "משפט פתיחה", widget: string }
+              - { name: phoneLabel, label: "כותרת טלפון", widget: string }
+              - { name: emailLabel, label: "כותרת דואר", widget: string }
+              - name: form
+                label: "טופס"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: name, label: "שדה שם", widget: string }
+                  - { name: phone, label: "שדה טלפון", widget: string }
+                  - { name: email, label: "שדה דואר", widget: string }
+                  - { name: required, label: "הודעת שדה חובה", widget: string }
+                  - { name: consent, label: "תיבת הסכמה", widget: string, hint: "הקישור למדיניות הפרטיות כתוב בסימנים <a ...>. לשנות רק את המילים." }
+                  - { name: submit, label: "כפתור שליחה", widget: string }
+                  - { name: success, label: "הודעת הצלחה", widget: string }
+                  - { name: error, label: "הודעת שגיאה", widget: string }
+              - name: whatsapp
+                label: "כפתור וואטסאפ"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: label, label: "טקסט הכפתור", widget: string }
+                  - { name: href, label: "קישור (https://wa.me/972...)", widget: string }
+
+          - name: nav
+            label: "תפריט"
+            widget: list
+            allow_add: false
+            allow_remove: false
+            allow_reorder: false
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: "שם בתפריט", widget: string }
+              - { name: href, widget: hidden }
+
+          - name: meta
+            label: "גוגל ושיתוף (כותרת ותיאור)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "כותרת הדף (בלשונית ובגוגל)", widget: string }
+              - { name: description, label: "תיאור קצר (בגוגל)", widget: string }
+              - { name: siteName, label: "שם האתר", widget: string }
+              - { name: ogLocale, widget: hidden }
+
+          - name: ui
+            label: "טקסטים קטנים (נגישות ותחתית)"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: skip, label: "קישור דילוג לתוכן", widget: string }
+              - { name: menuOpen, label: "כפתור תפריט", widget: string }
+              - { name: menuClose, label: "סגירת תפריט", widget: string }
+              - { name: navLabel, label: "שם התפריט (לקורא מסך)", widget: string }
+              - { name: photoAlt, label: "תיאור תמונת הפרופיל (לקורא מסך)", widget: string }
+              - { name: logoAlt, label: "תיאור הלוגו (לקורא מסך, אפשר ריק)", widget: string, required: false }
+              - { name: footerLabel, label: "שם תפריט התחתית (לקורא מסך)", widget: string }
+              - { name: footerPrivacy, label: "קישור מדיניות פרטיות", widget: string }
+              - { name: footerAccessibility, label: "קישור הצהרת נגישות", widget: string }
+
+      - name: privacy
+        label: מדיניות פרטיות
+        file: content/privacy.he.json
+        format: json
+        fields: &textPage
+          - { name: title, label: "כותרת", widget: string }
+          - { name: draft, widget: hidden }
+          - name: sections
+            label: "חלקים"
+            label_singular: "חלק"
+            widget: list
+            summary: "{{fields.heading}}"
+            fields:
+              - { name: heading, label: "כותרת החלק", widget: string }
+              - name: paragraphs
+                label: "פסקאות"
+                label_singular: "פסקה"
+                widget: list
+                field: { name: paragraph, label: "פסקה", widget: text }
+
+      - name: accessibility
+        label: הצהרת נגישות
+        file: content/accessibility.he.json
+        format: json
+        fields: *textPage
